@@ -47,6 +47,8 @@ i18n
           coinHistory: {
             title: 'Coin Transaction History',
             date: 'Date',
+            time: 'Heure',
+            time: 'Time',
             source: 'Source',
             amount: 'Amount',
             noHistory: 'No coin transaction history available.'
@@ -62,10 +64,46 @@ i18n
             fetchError: 'Failed to load your crops. Please try again later.',
             addError: 'Failed to add crop. It might already be added or an error occurred.'
           },
+          farm: {
+            title: 'My Farm',
+            buySeeds: 'Buy Seeds',
+            selectSeed: 'Select a seed',
+            coins: 'coins',
+            yourCoins: 'Your Coins',
+            plot: 'Plot',
+            planted: 'Planted',
+            plantedOn: 'Planted On',
+            growing: 'Growing',
+            plantSeed: 'Plant Seed',
+            selectSeedPrompt: 'Please select a seed to plant.',
+            plantSuccess: 'Seed planted successfully!',
+            plantError: 'Failed to plant seed.',
+            fetchError: 'Failed to load farm data. Please try again later.',
+            harvestButton: 'Harvest',
+            harvestSuccess: 'Crop harvested successfully!',
+            harvestError: 'Failed to harvest crop.',
+            harvestErrorGeneric: 'An error occurred while harvesting.',
+            inventory: 'Inventory',
+            emptyInventory: 'Your inventory is empty.',
+            quantity: 'Qty',
+            sellPrice: 'Sell Price',
+            sellButton: 'Sell',
+            sellSuccess: '{{quantity}} {{cropName}}(s) sold successfully!',
+            sellError: 'Failed to sell crop.',
+            sellErrorGeneric: 'An error occurred while selling.',
+            availableSeeds: 'Available Seeds',
+            price: 'Price',
+            growthPeriod: 'Growth Period',
+            days: 'days'
+          },
           learning: {
             games: {
               seasonQuiz: {
                 loading: 'Loading quiz data...'
+              },
+              plantMatching: {
+                title: 'Plant Matching Game',
+                description: 'Match plants with their descriptions.'
               }
             }
           }
@@ -85,10 +123,6 @@ i18n
               leaderboard: 'Clasificación',
               coinHistory: 'Historial de Monedas',
               userCrops: 'Mis Cultivos'
-            },
-            achievements: {
-              title: 'Tus Logros',
-              earned: 'Obtenido'
             }
           },
           leaderboard: {
@@ -102,6 +136,7 @@ i18n
           coinHistory: {
             title: 'Historial de Transacciones de Monedas',
             date: 'Fecha',
+            time: 'Hora',
             source: 'Fuente',
             amount: 'Cantidad',
             noHistory: 'No hay historial de transacciones de monedas disponible.'
@@ -117,10 +152,47 @@ i18n
             fetchError: 'No se pudieron cargar tus cultivos. Por favor, inténtalo de nuevo más tarde.',
             addError: 'No se pudo añadir el cultivo. Puede que ya esté añadido o que haya ocurrido un error.'
           },
+          farm: {
+            title: 'Mi Granja',
+            buySeeds: 'Comprar Semillas',
+            selectSeed: 'Seleccionar una semilla',
+            coins: 'monedas',
+            yourCoins: 'Tus Monedas',
+            plot: 'Parcela',
+            planted: 'Plantado',
+            plantedOn: 'Plantado el',
+            growing: 'Creciendo',
+            plantSeed: 'Plantar Semilla',
+            selectSeedPrompt: 'Por favor, selecciona una semilla para plantar.',
+            plantSuccess: '¡Semilla plantada con éxito!',
+            plantError: 'Error al plantar la semilla.',
+            plantErrorGeneric: 'Ocurrió un error al plantar.',
+            fetchError: 'Error al cargar los datos de la granja. Por favor, inténtalo de nuevo más tarde.',
+            harvestButton: 'Cosechar',
+            harvestSuccess: '¡Cultivo cosechado con éxito!',
+            harvestError: 'Error al cosechar el cultivo.',
+            harvestErrorGeneric: 'Ocurrió un error al cosechar.',
+            inventory: 'Inventario',
+            emptyInventory: 'Tu inventario está vacío.',
+            quantity: 'Cant.',
+            sellPrice: 'Precio de Venta',
+            sellButton: 'Vender',
+            sellSuccess: '¡{{quantity}} {{cropName}}(s) vendido(s) con éxito!',
+            sellError: 'Error al vender el cultivo.',
+            sellErrorGeneric: 'Ocurrió un error al vender.',
+            availableSeeds: 'Semillas Disponibles',
+            price: 'Precio',
+            growthPeriod: 'Período de Crecimiento',
+            days: 'días'
+          },
           learning: {
             games: {
               seasonQuiz: {
                 loading: 'Cargando datos del cuestionario...'
+              },
+              plantMatching: {
+                title: 'Juego de Emparejar Plantas',
+                description: 'Empareja plantas con sus descripciones.'
               }
             }
           }
@@ -140,10 +212,6 @@ i18n
               leaderboard: 'Classement',
               coinHistory: 'Historique des Pièces',
               userCrops: 'Mes Cultures'
-            },
-            achievements: {
-              title: 'Vos Réalisations',
-              earned: 'Obtenu'
             }
           },
           leaderboard: {
@@ -157,6 +225,7 @@ i18n
           coinHistory: {
             title: 'Historique des Transactions de Pièces',
             date: 'Date',
+            time: 'Heure',
             source: 'Source',
             amount: 'Montant',
             noHistory: 'Aucun historique des transactions de pièces disponible.'
@@ -172,10 +241,47 @@ i18n
             fetchError: 'Échec du chargement de vos cultures. Veuillez réessayer plus tard.',
             addError: 'Échec de l\'ajout de la culture. Elle est peut-être déjà ajoutée ou une erreur est survenue.'
           },
+          farm: {
+            title: 'Ma Ferme',
+            buySeeds: 'Acheter des graines',
+            selectSeed: 'Sélectionner une graine',
+            coins: 'pièces',
+            yourCoins: 'Vos Pièces',
+            plot: 'Parcelle',
+            planted: 'Planté',
+            plantedOn: 'Planté le',
+            growing: 'En croissance',
+            plantSeed: 'Planter la graine',
+            selectSeedPrompt: 'Veuillez sélectionner une graine à planter.',
+            plantSuccess: 'Graine plantée avec succès !',
+            plantError: 'Échec de la plantation de la graine.',
+            plantErrorGeneric: 'Une erreur est survenue lors de la plantation.',
+            fetchError: 'Échec du chargement des données de la ferme. Veuillez réessayer plus tard.',
+            harvestButton: 'Récolter',
+            harvestSuccess: 'Culture récoltée avec succès !',
+            harvestError: 'Échec de la récolte de la culture.',
+            harvestErrorGeneric: 'Une erreur est survenue lors de la récolte.',
+            inventory: 'Inventaire',
+            emptyInventory: 'Votre inventaire est vide.',
+            quantity: 'Qté',
+            sellPrice: 'Prix de vente',
+            sellButton: 'Vendre',
+            sellSuccess: '{{quantity}} {{cropName}}(s) vendu(s) avec succès !',
+            sellError: 'Échec de la vente de la culture.',
+            sellErrorGeneric: 'Une erreur est survenue lors de la vente.',
+            availableSeeds: 'Graines disponibles',
+            price: 'Prix',
+            growthPeriod: 'Période de croissance',
+            days: 'jours'
+          },
           learning: {
             games: {
               seasonQuiz: {
                 loading: 'Chargement des données du quiz...'
+              },
+              plantMatching: {
+                title: 'Jeu d\'association de plantes',
+                description: 'Associez les plantes à leurs descriptions.'
               }
             }
           }

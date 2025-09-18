@@ -79,7 +79,8 @@ const Quiz = ({ quizData, onComplete }) => {
       onComplete({
         score: newScore,
         totalQuestions: questions.length,
-        percentage: Math.round((newScore / questions.length) * 100)
+        percentage: Math.round((newScore / questions.length) * 100),
+        source: "Quiz Game"
       });
     }
   };

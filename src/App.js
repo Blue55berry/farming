@@ -16,6 +16,7 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import Farm from './components/farm/Farm';
 
 function App() {
   useEffect(() => {
@@ -42,6 +43,7 @@ function App() {
                   <Route path="/diagnosis" element={<ProtectedRoute><Diagnosis /></ProtectedRoute>} />
                   <Route path="/learning" element={<ProtectedRoute><Learning /></ProtectedRoute>} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/farm" element={<ProtectedRoute><Farm /></ProtectedRoute>} />
                 </Routes>
               </main>
             </div>

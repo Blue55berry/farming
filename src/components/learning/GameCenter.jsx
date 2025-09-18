@@ -4,12 +4,14 @@ import { useAuth } from "../../contexts/AuthContext";
 import authService from "../../api/authService";
 import Quiz from "./Quiz";
 import FarmingGame from "./FarmingGame";
+import PlantMatchingGame from "./PlantMatchingGame";
 
 const GameCenter = () => {
   const { t, i18n } = useTranslation();
   const { currentUser, addCoinsToUser } = useAuth();
   const [activeGame, setActiveGame] = useState(null);
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
+  const [coinsAwardedForSession, setCoinsAwardedForSession] = useState(false); // New state variable
 
   const quizSequence = ["seasonQuiz"]; // Define the sequence of quizzes
 
@@ -32,15 +34,16 @@ const GameCenter = () => {
       id: "fruitCollection",
       title: t("learning.games.fruitCollection.title"),
       description: t("learning.games.fruitCollection.description"),
-      image: "https://via.placeholder.com/400x225?text=Fruit+Collection",
+      image: "/images/placeholder_game.png", // Changed to local placeholder
       difficulty: "easy",
     },
   ];
 
   const handleGameComplete = async (results) => {
-    if (currentUser && results.coins > 0) {
+    if (currentUser && results.coins > 0 && !coinsAwardedForSession) { // Check flag
       try {
         await addCoinsToUser(results.coins, results.source || "Game Reward");
+        setCoinsAwardedForSession(true); // Set flag to true after awarding
       } catch (error) {
         console.error("Failed to add coins:", error);
       }
@@ -63,6 +66,7 @@ const GameCenter = () => {
   const handleCloseGame = () => {
     setActiveGame(null);
     setCurrentQuizIndex(0); // Reset when closing game
+    setCoinsAwardedForSession(false); // Reset flag when closing game
   };
 
   // Temporary quiz data for the season quiz
@@ -132,19 +136,7 @@ const GameCenter = () => {
           <div className="text-center p-8 text-gray-500">{t("learning.games.seasonQuiz.loading")}</div>
         );
       case "plantMatchingGame":
-        return (
-          <div className="text-center p-8">
-            <p className="text-gray-500 mb-4">
-              {t("learning.games.comingSoon")}
-            </p>
-            <button
-              onClick={handleCloseGame}
-              className="py-2 px-4 bg-leaf-green text-white rounded-md hover:bg-green-700"
-            >
-              {t("learning.games.backToGames")}
-            </button>
-          </div>
-        );
+        return <PlantMatchingGame onComplete={handleGameComplete} />;
       case "fruitCollection":
         return <FarmingGame onComplete={handleGameComplete} />;
       default:
@@ -221,6 +213,7 @@ const GameCenter = () => {
                 <button
                   onClick={() => {
                     setActiveGame(game.id);
+                    setCoinsAwardedForSession(false); // Reset flag when starting a new game
                     if (quizSequence.includes(game.id)) {
                       setCurrentQuizIndex(quizSequence.indexOf(game.id));
                     }

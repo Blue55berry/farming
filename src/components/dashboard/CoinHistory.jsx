@@ -25,6 +25,12 @@ const CoinHistory = ({ coinHistory }) => {
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
+                {t('coinHistory.time')}
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 {t('coinHistory.source')}
               </th>
               <th
@@ -40,6 +46,9 @@ const CoinHistory = ({ coinHistory }) => {
               <tr key={index}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                   {new Date(entry.date).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {new Date(entry.date).toLocaleTimeString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                   {entry.source}

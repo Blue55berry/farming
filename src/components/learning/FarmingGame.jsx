@@ -36,7 +36,7 @@ const FarmingGame = ({ onComplete }) => {
       setGameOver(true);
       if (onComplete) {
         const coins = Math.floor(score / 10);
-        onComplete({ score, coins });
+        onComplete({ score, coins, source: t('learning.fruitCollection.title') });
       }
     }
   }, [timeLeft, gameOver, onComplete, score]);
