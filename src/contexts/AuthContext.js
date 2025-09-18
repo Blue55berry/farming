@@ -38,11 +38,23 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser(null);
   };
 
+  const addCoinsToUser = async (coins, source) => {
+    try {
+      const updatedUser = await authService.addCoins(coins, source);
+      setCurrentUser(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      console.error("Failed to add coins and update user context:", error);
+      throw error;
+    }
+  };
+
   const value = {
     currentUser,
     login,
     register,
     logout,
+    addCoinsToUser,
     loading
   };
 

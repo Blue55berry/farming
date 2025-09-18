@@ -6,10 +6,12 @@ import Quiz from "./Quiz";
 import FarmingGame from "./FarmingGame";
 
 const GameCenter = () => {
-  const { t } = useTranslation();
-  const { currentUser } = useAuth();
+  const { t, i18n } = useTranslation();
+  const { currentUser, addCoinsToUser } = useAuth();
   const [activeGame, setActiveGame] = useState(null);
-  const [gameResults, setGameResults] = useState(null);
+  const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
+
+  const quizSequence = ["seasonQuiz"]; // Define the sequence of quizzes
 
   const games = [
     {
@@ -36,80 +38,98 @@ const GameCenter = () => {
   ];
 
   const handleGameComplete = async (results) => {
-    setGameResults(results);
     if (currentUser && results.coins > 0) {
       try {
-        await authService.addCoins(results.coins);
+        await addCoinsToUser(results.coins, results.source || "Game Reward");
       } catch (error) {
         console.error("Failed to add coins:", error);
+      }
+    }
+
+    // Move to the next quiz in the sequence
+    if (activeGame === quizSequence[currentQuizIndex]) {
+      const nextIndex = currentQuizIndex + 1;
+      if (nextIndex < quizSequence.length) {
+        setCurrentQuizIndex(nextIndex);
+        setActiveGame(quizSequence[nextIndex]);
+      } else {
+        // All quizzes completed, return to game selection
+        setActiveGame(null);
+        setCurrentQuizIndex(0); // Reset for next time
       }
     }
   };
 
   const handleCloseGame = () => {
     setActiveGame(null);
-    setGameResults(null);
+    setCurrentQuizIndex(0); // Reset when closing game
   };
 
   // Temporary quiz data for the season quiz
-  const seasonQuizData = [
+  const seasonQuizData = i18n.isInitialized ? [
     {
-      question: t("learning.games.seasonQuiz.questions.q1.question"),
+      question: t("1. Which of the following is a common method of crop rotation used in farming?"),
       options: [
-        t("learning.games.seasonQuiz.questions.q1.options.a"),
-        t("learning.games.seasonQuiz.questions.q1.options.b"),
-        t("learning.games.seasonQuiz.questions.q1.options.c"),
-        t("learning.games.seasonQuiz.questions.q1.options.d"),
-      ],
-      correctAnswer: 2,
-    },
-    {
-      question: t("learning.games.seasonQuiz.questions.q2.question"),
-      options: [
-        t("learning.games.seasonQuiz.questions.q2.options.a"),
-        t("learning.games.seasonQuiz.questions.q2.options.b"),
-        t("learning.games.seasonQuiz.questions.q2.options.c"),
-        t("learning.games.seasonQuiz.questions.q2.options.d"),
+        t("a) Planting the same crop every year"),
+        t("b) Planting different crops in sequence to maintain soil health"),
+        t("c) Using only chemical fertilizers"),
+        t("D) Ignoring the natural growing season"),
       ],
       correctAnswer: 1,
     },
     {
-      question: t("learning.games.seasonQuiz.questions.q3.question"),
+      question: t("2. What is the primary purpose of using cover crops in farming?"),
       options: [
-        t("learning.games.seasonQuiz.questions.q3.options.a"),
-        t("learning.games.seasonQuiz.questions.q3.options.b"),
-        t("learning.games.seasonQuiz.questions.q3.options.c"),
-        t("learning.games.seasonQuiz.questions.q3.options.d"),
+        t("a) To prevent soil erosion"),
+        t("b) To increase the cost of farming"),
+        t("c) To reduce the need for irrigation"),
+        t("d) To attract pests away from main crops"),
       ],
       correctAnswer: 0,
     },
     {
-      question: t("learning.games.seasonQuiz.questions.q4.question"),
+      question: t("3. Which farming practice is used to conserve water and reduce soil erosion?"),
       options: [
-        t("learning.games.seasonQuiz.questions.q4.options.a"),
-        t("learning.games.seasonQuiz.questions.q4.options.b"),
-        t("learning.games.seasonQuiz.questions.q4.options.c"),
-        t("learning.games.seasonQuiz.questions.q4.options.d"),
-      ],
-      correctAnswer: 3,
-    },
-    {
-      question: t("learning.games.seasonQuiz.questions.q5.question"),
-      options: [
-        t("learning.games.seasonQuiz.questions.q5.options.a"),
-        t("learning.games.seasonQuiz.questions.q5.options.b"),
-        t("learning.games.seasonQuiz.questions.q5.options.c"),
-        t("learning.games.seasonQuiz.questions.q5.options.d"),
+        t("a) Tilling the soil deeply"),
+        t("b) No-till farming"),
+        t("c) Planting monocrops"),
+        t("d) Overgrazing"),
       ],
       correctAnswer: 1,
     },
-  ];
+    {
+      question: t("4. Which of the following is considered a sustainable farming practice?"),
+      options: [
+        t("a) Using synthetic pesticides on all crops"),
+        t("b) Growing genetically modified crops exclusively"),
+        t("c) Using organic farming methods to reduce environmental impact"),
+        t("d) Burning large amounts of crop residue"),
+      ],
+      correctAnswer: 2,
+    },
+    {
+      question: t("5. What is agroforestry?"),
+      options: [
+        t("a) The practice of planting only trees"),
+        t("b) The integration of trees and shrubs into agricultural land to improve biodiversity"),
+        t("c) A type of monoculture farming"),
+        t("d) A method of deep water irrigation"),
+      ],
+      correctAnswer: 1,
+    },
+  ] : [];
 
   const renderGame = () => {
+    if (!i18n.isInitialized) {
+      return <div className="text-center p-8 text-gray-500">{t("learning.games.seasonQuiz.loading")}</div>;
+    }
+
     switch (activeGame) {
       case "seasonQuiz":
-        return (
+        return seasonQuizData.length > 0 ? (
           <Quiz quizData={seasonQuizData} onComplete={handleGameComplete} />
+        ) : (
+          <div className="text-center p-8 text-gray-500">{t("learning.games.seasonQuiz.loading")}</div>
         );
       case "plantMatchingGame":
         return (
@@ -199,7 +219,12 @@ const GameCenter = () => {
                 <p className="text-gray-600 text-sm mb-4">{game.description}</p>
 
                 <button
-                  onClick={() => setActiveGame(game.id)}
+                  onClick={() => {
+                    setActiveGame(game.id);
+                    if (quizSequence.includes(game.id)) {
+                      setCurrentQuizIndex(quizSequence.indexOf(game.id));
+                    }
+                  }}
                   className="w-full py-2 bg-leaf-green text-white rounded-md hover:bg-green-700 transition-colors"
                 >
                   {t("learning.games.play")}

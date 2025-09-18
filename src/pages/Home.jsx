@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import image from '../images/imagehome.jpg'
 
 const Home = () => {
   const { t } = useTranslation();
@@ -7,10 +8,18 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-green-500 to-green-700 text-white py-20">
-        <div className="container mx-auto px-4 text-center">
+      <section className="relative text-white py-28 font-serif">
+        <div className="absolute inset-0">
+          <img
+            src={image}
+            alt="Hero Background"
+            className="w-full h-full object-cover opacity-80"
+          />
+          <div className="absolute inset-0 bg-black opacity-20"></div>
+        </div>
+        <div className="container mx-auto px-4 text-center relative z-10">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            {t("home.hero.title")}
+            {t("Farming Made Easy")}
           </h1>
           <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto">
             {t("home.hero.subtitle")}

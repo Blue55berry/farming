@@ -49,8 +49,8 @@ const getUser = async () => {
   return null;
 };
 
-const addCoins = async (coins) => {
-  const response = await axios.post(`${API_URL}/add-coins`, { coins });
+const addCoins = async (coins, source) => {
+  const response = await axios.post(`${API_URL}/add-coins`, { coins, source });
   return response.data;
 };
 

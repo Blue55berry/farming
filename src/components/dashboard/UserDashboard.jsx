@@ -3,11 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import ProgressTracker from './ProgressTracker';
 import SavedContent from './SavedContent';
+import Leaderboard from './Leaderboard';
+import CoinHistory from './CoinHistory';
+import UserCrops from './UserCrops';
 
 const UserDashboard = () => {
   const { t } = useTranslation();
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('progress');
+  const [userStats, setUserStats] = useState({ achievements: [] });
   
   
 
@@ -31,12 +35,15 @@ const UserDashboard = () => {
                 {t('dashboard.welcome', { name: currentUser?.name || 'User' })}
               </h1>
               <p className="text-green-50">
-                {t('dashboard.lastLogin', { date: new Date().toLocaleDateString() })}
+                {t('dashboard.lastLogin', { date: new Date(currentUser.lastLogin).toLocaleDateString() })}
               </p>
             </div>
             
             <div className="mt-4 md:mt-0 grid grid-cols-2 gap-4 text-center">
-              <div className="bg-white bg-opacity-20 rounded-lg p-3">
+              <div
+                className="bg-white bg-opacity-20 rounded-lg p-3 cursor-pointer hover:bg-opacity-30 transition-all duration-200"
+                onClick={() => setActiveTab('coinHistory')}
+              >
                 <div className="text-2xl font-bold">{currentUser.coins || 0}</div>
                 <div className="text-sm text-green-100">{t('dashboard.coins')}</div>
               </div>
@@ -80,6 +87,36 @@ const UserDashboard = () => {
             >
               {t('dashboard.tabs.achievements')}
             </button>
+            <button
+              className={`py-4 px-6 font-medium text-sm focus:outline-none ${
+                activeTab === 'leaderboard'
+                  ? 'text-leaf-green border-b-2 border-leaf-green'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => setActiveTab('leaderboard')}
+            >
+              {t('dashboard.tabs.leaderboard')}
+            </button>
+            <button
+              className={`py-4 px-6 font-medium text-sm focus:outline-none ${
+                activeTab === 'coinHistory'
+                  ? 'text-leaf-green border-b-2 border-leaf-green'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => setActiveTab('coinHistory')}
+            >
+              {t('dashboard.tabs.coinHistory')}
+            </button>
+            <button
+              className={`py-4 px-6 font-medium text-sm focus:outline-none ${
+                activeTab === 'userCrops'
+                  ? 'text-leaf-green border-b-2 border-leaf-green'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => setActiveTab('userCrops')}
+            >
+              {t('dashboard.tabs.userCrops')}
+            </button>
           </div>
         </div>
         
@@ -112,6 +149,9 @@ const UserDashboard = () => {
               </div>
             </div>
           )}
+          {activeTab === 'leaderboard' && <Leaderboard />}
+          {activeTab === 'coinHistory' && <CoinHistory coinHistory={currentUser.coinHistory} />}
+          {activeTab === 'userCrops' && <UserCrops />}
         </div>
       </div>
     </div>
