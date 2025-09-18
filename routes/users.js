@@ -557,11 +557,29 @@ router.get('/leaderboard', async (req, res) => {
   }
 });
 
-// @route   POST api/users/crops
-// @desc    Add a crop to user's personal list
+// @route   GET api/users/land
+// @desc    Get user's land plots
 // @access  Private
-router.post('/crops', auth, async (req, res) => {
-  const { cropId } = req.body;
+router.get('/land', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate('landPlots.cropId');
+
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    res.json(user.landPlots);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// @route   POST api/users/land/plant
+// @desc    Plant a seed on a land plot
+// @access  Private
+router.post('/land/plant', auth, async (req, res) => {
+  const { plotNumber, cropId } = req.body;
 
   try {
     const user = await User.findById(req.user.id);
@@ -570,34 +588,148 @@ router.post('/crops', auth, async (req, res) => {
       return res.status(404).json({ msg: 'User not found' });
     }
 
-    // Check if crop is already added
-    if (user.userCrops.includes(cropId)) {
-      return res.status(400).json({ msg: 'Crop already added' });
+    const plot = user.landPlots.find(p => p.plotNumber === plotNumber);
+
+    if (!plot) {
+      return res.status(404).json({ msg: 'Land plot not found' });
     }
 
-    user.userCrops.unshift(cropId);
+    if (plot.isPlanted) {
+      return res.status(400).json({ msg: 'Plot is already planted' });
+    }
+
+    const crop = await Crop.findById(cropId);
+
+    if (!crop) {
+      return res.status(404).json({ msg: 'Crop not found' });
+    }
+
+    if (user.coins < crop.seedPrice) {
+      return res.status(400).json({ msg: 'Not enough coins to buy this seed' });
+    }
+
+    // Deduct coins
+    user.coins -= crop.seedPrice;
+    user.coinHistory.unshift({ amount: -crop.seedPrice, source: `Bought ${crop.name} seed`, date: Date.now() });
+
+    // Plant the seed
+    plot.isPlanted = true;
+    plot.cropId = cropId;
+    plot.plantingTime = Date.now();
+    plot.growthStage = 0;
+
     await user.save();
 
-    const populatedUser = await User.findById(req.user.id).populate('userCrops');
-    res.json(populatedUser.userCrops);
+    // Return the updated user object to update frontend context
+    const updatedUser = await User.findById(req.user.id).populate('landPlots.cropId');
+    res.json(updatedUser);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
   }
 });
 
-// @route   GET api/users/crops
-// @desc    Get all crops for the current user
+// @route   POST api/users/land/harvest
+// @desc    Harvest a crop from a land plot
 // @access  Private
-router.get('/crops', auth, async (req, res) => {
+router.post('/land/harvest', auth, async (req, res) => {
+  const { plotNumber } = req.body;
+
   try {
-    const user = await User.findById(req.user.id).populate('userCrops');
+    const user = await User.findById(req.user.id);
 
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
 
-    res.json(user.userCrops);
+    const plot = user.landPlots.find(p => p.plotNumber === plotNumber);
+
+    if (!plot) {
+      return res.status(404).json({ msg: 'Land plot not found' });
+    }
+
+    if (!plot.isPlanted || !plot.cropId) {
+      return res.status(400).json({ msg: 'No crop planted on this plot' });
+    }
+
+    // Check if crop is mature (growthStage >= 100)
+    if (plot.growthStage < 100) {
+      return res.status(400).json({ msg: 'Crop is not yet mature enough to harvest' });
+    }
+
+    const harvestedCropId = plot.cropId;
+
+    // Add to inventory
+    const existingInventoryItem = user.inventory.find(item => item.cropId.toString() === harvestedCropId.toString());
+    if (existingInventoryItem) {
+      existingInventoryItem.quantity += 1;
+    } else {
+      user.inventory.push({ cropId: harvestedCropId, quantity: 1 });
+    }
+
+    // Clear the plot
+    plot.isPlanted = false;
+    plot.cropId = null;
+    plot.plantingTime = null;
+    plot.growthStage = 0;
+
+    await user.save();
+
+    // Return the updated user object to update frontend context
+    const updatedUser = await User.findById(req.user.id).populate('landPlots.cropId inventory.cropId');
+    res.json(updatedUser);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// @route   POST api/users/inventory/sell
+// @desc    Sell a harvested crop from inventory
+// @access  Private
+router.post('/inventory/sell', auth, async (req, res) => {
+  const { cropId, quantity } = req.body;
+
+  if (typeof quantity !== 'number' || quantity <= 0) {
+    return res.status(400).json({ msg: 'Invalid quantity' });
+  }
+
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    const inventoryItem = user.inventory.find(item => item.cropId.toString() === cropId);
+
+    if (!inventoryItem || inventoryItem.quantity < quantity) {
+      return res.status(400).json({ msg: 'Not enough crops in inventory to sell' });
+    }
+
+    const crop = await Crop.findById(cropId);
+
+    if (!crop) {
+      return res.status(404).json({ msg: 'Crop not found' });
+    }
+
+    const earnings = crop.harvestPrice * quantity;
+
+    // Deduct from inventory
+    inventoryItem.quantity -= quantity;
+    if (inventoryItem.quantity === 0) {
+      user.inventory = user.inventory.filter(item => item.cropId.toString() !== cropId);
+    }
+
+    // Add coins
+    user.coins += earnings;
+    user.coinHistory.unshift({ amount: earnings, source: `Sold ${quantity} ${crop.name}(s)`, date: Date.now() });
+
+    await user.save();
+
+    // Return the updated user object to update frontend context
+    const updatedUser = await User.findById(req.user.id).populate('landPlots.cropId inventory.cropId');
+    res.json(updatedUser);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

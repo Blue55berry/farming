@@ -47,6 +47,28 @@ const CropSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true
+  },
+  seedPrice: {
+    type: Number,
+    required: true,
+    default: 10 // Default price for seeds
+  },
+  seedImage: {
+    type: String,
+  },
+  seedlingImage: {
+    type: String,
+  },
+  youngPlantImage: {
+    type: String,
+  },
+  maturePlantImage: {
+    type: String,
+  },
+  harvestPrice: {
+    type: Number,
+    required: true,
+    default: 50 // Default harvest price
   }
 }, { timestamps: true });
 

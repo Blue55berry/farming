@@ -104,7 +104,36 @@ const UserSchema = new mongoose.Schema({
       type: Date,
       default: Date.now
     }
-  }]
+  }],
+  landPlots: [
+    {
+      plotNumber: { type: Number, required: true },
+      isPlanted: { type: Boolean, default: false },
+      cropId: { type: mongoose.Schema.Types.ObjectId, ref: 'Crop', default: null },
+      plantingTime: { type: Date, default: null },
+      growthStage: { type: Number, default: 0 }, // 0-100
+    },
+    {
+      plotNumber: { type: Number, required: true },
+      isPlanted: { type: Boolean, default: false },
+      cropId: { type: mongoose.Schema.Types.ObjectId, ref: 'Crop', default: null },
+      plantingTime: { type: Date, default: null },
+      growthStage: { type: Number, default: 0 },
+    },
+    {
+      plotNumber: { type: Number, required: true },
+      isPlanted: { type: Boolean, default: false },
+      cropId: { type: mongoose.Schema.Types.ObjectId, ref: 'Crop', default: null },
+      plantingTime: { type: Date, default: null },
+      growthStage: { type: Number, default: 0 },
+    },
+  ],
+  inventory: [
+    {
+      cropId: { type: mongoose.Schema.Types.ObjectId, ref: 'Crop', required: true },
+      quantity: { type: Number, default: 0 },
+    },
+  ]
 }, {
   timestamps: true
 });
