@@ -100,6 +100,10 @@ router.post(
         return res.status(400).json({ errors: [{ msg: 'Invalid credentials' }] });
       }
 
+      // Update last login time
+      user.lastLogin = Date.now();
+      await user.save();
+
       // Create JWT payload
       const payload = {
         user: {
@@ -130,7 +134,7 @@ router.post(
 // @access  Private
 router.get('/me', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.user.id).select('name email avatar lastLogin role coins coinHistory userCrops savedItems progress quizResults');
     
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
@@ -512,7 +516,7 @@ router.get('/quiz-results', auth, async (req, res) => {
 // @desc    Add coins to user account
 // @access  Private
 router.post('/add-coins', auth, async (req, res) => {
-  const { coins } = req.body;
+  const { coins, source } = req.body;
 
   if (typeof coins !== 'number' || coins <= 0) {
     return res.status(400).json({ msg: 'Invalid number of coins' });
@@ -526,9 +530,74 @@ router.post('/add-coins', auth, async (req, res) => {
     }
 
     user.coins = (user.coins || 0) + coins;
+    user.coinHistory.unshift({ amount: coins, source: source || 'Earned', date: Date.now() }); // Add to history
     await user.save();
 
-    res.json({ coins: user.coins });
+    res.json(user); // Return the updated user object
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// @route   GET api/users/leaderboard
+// @desc    Get leaderboard (users sorted by coins)
+// @access  Public
+router.get('/leaderboard', async (req, res) => {
+  try {
+    const leaderboard = await User.find({})
+      .sort({ coins: -1 }) // Sort by coins in descending order
+      .select('name coins') // Select only name and coins
+      .limit(20); // Limit to top 20 users
+
+    res.json(leaderboard);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// @route   POST api/users/crops
+// @desc    Add a crop to user's personal list
+// @access  Private
+router.post('/crops', auth, async (req, res) => {
+  const { cropId } = req.body;
+
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    // Check if crop is already added
+    if (user.userCrops.includes(cropId)) {
+      return res.status(400).json({ msg: 'Crop already added' });
+    }
+
+    user.userCrops.unshift(cropId);
+    await user.save();
+
+    const populatedUser = await User.findById(req.user.id).populate('userCrops');
+    res.json(populatedUser.userCrops);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// @route   GET api/users/crops
+// @desc    Get all crops for the current user
+// @access  Private
+router.get('/crops', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate('userCrops');
+
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    res.json(user.userCrops);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

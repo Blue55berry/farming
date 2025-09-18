@@ -18,6 +18,10 @@ const UserSchema = new mongoose.Schema({
   avatar: {
     type: String
   },
+  lastLogin: {
+    type: Date,
+    default: Date.now
+  },
   role: {
     type: String,
     enum: ['user', 'admin'],
@@ -27,6 +31,28 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  coinHistory: [
+    {
+      amount: {
+        type: Number,
+        required: true,
+      },
+      source: {
+        type: String,
+        required: true,
+      },
+      date: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
+  userCrops: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Crop',
+    },
+  ],
   savedItems: [{
     itemType: {
       type: String,
